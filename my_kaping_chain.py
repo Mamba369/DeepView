@@ -4,6 +4,7 @@ import json
 from langchain_openai import OpenAI
 from langchain_core.prompts import PromptTemplate
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score
+from datasets import load_dataset
 from wikidata_retriever import WikidataRetriever
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -21,7 +22,7 @@ INSTRUCTIONS = """Answer the user's question as concisely as possible.
 If the answer is a number, then response should be just number, not text."""
 
 RESULTS_DIR = "results"
-EXPERIMENTS = 50
+EXPERIMENTS = 15
 
 
 class MyKAPINGChain:
@@ -37,6 +38,7 @@ class MyKAPINGChain:
         self.with_caching = with_caching
         self.llm = OpenAI(temperature=0)
         self.top_k = top_k
+        self.dataset = load_dataset("AmazonScience/mintaka", trust_remote_code=True)
         self.retriever = WikidataRetriever(with_caching=with_caching)
         self.__kaping_prompt_template = PromptTemplate(
             input_variables=["question_number", "question", "fewshots", "entities"],
@@ -129,7 +131,7 @@ Answer:""",
         }
 
     def run_experiments(self, experiments=range(EXPERIMENTS)) -> dict:
-        selected_dataset = self.retriever.dataset["test"].select(experiments)
+        selected_dataset = self.dataset["test"].select(experiments)
 
         predictions = [
             self.answer_question(

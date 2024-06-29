@@ -2,9 +2,7 @@ import logging
 from SPARQLWrapper import SPARQLWrapper, JSON, POST
 import json
 from sentence_transformers import util, SentenceTransformer
-from datasets import load_dataset
 import requests
-from urllib.parse import urlparse
 import time
 import os
 import warnings
@@ -28,7 +26,6 @@ class WikidataRetriever:
             os.makedirs(DATA_DIR)
         self.sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
         self.model = SentenceTransformer("paraphrase-mpnet-base-v2")
-        self.dataset = load_dataset("AmazonScience/mintaka", trust_remote_code=True)
         self.limit = limit
         self.retry_delay = retry_delay
         self.with_caching = with_caching
